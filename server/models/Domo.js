@@ -20,6 +20,11 @@ const DomoSchema = new mongoose.Schema({
         required: true,
         ref: 'Account',
     },
+    level: {
+        type: Number,
+        min: 0,
+        required: true,
+    },
     createdDate: {
         type: Date,
         default: Date.now,
@@ -29,6 +34,7 @@ const DomoSchema = new mongoose.Schema({
 DomoSchema.statics.toAPI = (doc) => ({
     name: doc.name,
     age: doc.age,
+    level: doc.level
 });
 
 const DomoModel = mongoose.model('Domo', DomoSchema);

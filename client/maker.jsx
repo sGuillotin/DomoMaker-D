@@ -9,14 +9,20 @@ const handleDomo = (e, onDomoAdded) => {
 
     const name = e.target.querySelector('#domoName').value;
     const age = e.target.querySelector('#domoAge').value;
+    const level = e.target.querySelector('#domoLevel').value;
 
-    if (!name || !age) {
+    if (!name || !age || !level) {
         helper.handleError('All fields are required');
         return false;
     }
 
-    helper.sendPost(e.target.action, { name, age }, onDomoAdded);
+    helper.sendPost(e.target.action, { name, age, level }, onDomoAdded);
     return false;
+};
+
+const handleLevelUp = (onLevelUp) => {
+    helper.hideError();
+    helper.sendPost('/levelup', {}, onLevelUp);
 };
 
 const DomoForm = (props) => {
@@ -29,11 +35,20 @@ const DomoForm = (props) => {
             method="POST"
             className="domoForm"
         >
-            <label htmlFor="name">Name: </label>
+            <label htmlFor="domoName">Name: </label>
             <input id="domoName" type="text" name="name" placeholder="Domo Name" />
-            <label htmlFor="age">Age: </label>
+            <label htmlFor="domoAge">Age: </label>
             <input id="domoAge" type="number" min="0" name="age" />
+            <label htmlFor="domoLevel">Level: </label>
+            <input id="domoLevel" type="number" min="0" name="level" />
             <input className="makeDomoSubmit" type="submit" value="Make Domo" />
+            <button
+                type="button"
+                className="levelUpButton"
+                onClick={() => handleLevelUp(props.triggerReload)}
+            >
+                Level Up All Domos
+            </button>
         </form>
     );
 };
@@ -65,6 +80,7 @@ const DomoList = (props) => {
                 <img src="/assets/img/domoface.jpeg" alt="domo face" className="domoFace" />
                 <h3 className="domoName">Name: {domo.name}</h3>
                 <h3 className="domoAge">Age: {domo.age}</h3>
+                <h3 className="domoLevel">Level: {domo.level}</h3>
             </div>
         );
     });

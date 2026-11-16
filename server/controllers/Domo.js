@@ -3,32 +3,24 @@ const Domo = models.Domo;
 
 const makerPage = async (req, res) => {
     return res.render('app');
-    // try {
-    //     const query = { owner: req.session.account._id };
-    //     const docs = await Domo.find(query).select('name age').lean().exec();
-    //     return res.render('app', { domos: docs });
-    // } catch (err) {
-    //     console.log(err);
-    //     return res.status(500).json({ error: 'Error retrieving domos!' });
-    // }
 };
 
 const makeDomo = async (req, res) => {
-    if (!req.body.name || !req.body.age) {
-        return res.status(400).json({ error: 'Both name and age are required!' });
+    if (!req.body.name || !req.body.age || !req.body.level) {
+        return res.status(400).json({ error: 'Name, age, and level are required!' });
     }
 
     const domoData = {
         name: req.body.name,
         age: req.body.age,
+        level: req.body.level,
         owner: req.session.account._id,
     };
 
     try {
         const newDomo = new Domo(domoData);
         await newDomo.save();
-        // return res.json({ redirect: '/maker' });
-        return res.status(201).json({ name: newDomo.name, age: newDomo.age });
+        return res.status(201).json({ name: newDomo.name, age: newDomo.age, level: newDomo.level });
     } catch (err) {
         console.log(err);
         if (err.code === 11000) {
@@ -41,7 +33,7 @@ const makeDomo = async (req, res) => {
 const getDomos = async (req, res) => {
     try {
         const query = { owner: req.session.account._id };
-        const docs = await Domo.find(query).select('name age').lean().exec();
+        const docs = await Domo.find(query).select('name age level').lean().exec();
         return res.json({ domos: docs });
     } catch (err) {
         console.log(err);
@@ -49,8 +41,20 @@ const getDomos = async (req, res) => {
     }
 };
 
+const levelUpDomos = async (req, res) => {
+    try {
+        const query = { owner: req.session.account._id };
+        await Domo.updateMany(query, { $inc: { level: 1 } }).exec();
+        return res.status(200).json({ message: 'All Domos leveled up!' });
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ error: 'Error leveling up domos!' });
+    }
+};
+
 module.exports = {
     makerPage,
     makeDomo,
     getDomos,
+    levelUpDomos,
 };
